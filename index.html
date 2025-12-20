@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ayşe için Küçük Bir Sürpriz</title>
+    <style>
+        :root { --main-pink: #ff4d6d; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            /* Arka plan resmi ayarları */
+            background-image: url('bg.jpg'); /* Fotoğrafın adı burada */
+            background-size: cover; /* Tüm ekranı kapla */
+            background-position: center; /* Ortala */
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        
+        /* Fotoğrafın üzerine gelen pembe filtre katmanı */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 240, 243, 0.85); /* %85 opaklıkta pembe filtre */
+            z-index: 1;
+        }
+
+        #game-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
+        #ui { position: absolute; top: 20px; z-index: 10; text-align: center; width: 100%; }
+        .heart { position: absolute; font-size: 30px; cursor: pointer; user-select: none; transition: transform 0.1s; z-index: 8; }
+        #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px; border: 2px solid var(--main-pink); z-index: 20; }
+        h1 { color: var(--main-pink); font-size: 1.5rem; }
+        #score-board { font-weight: bold; font-size: 1.2rem; }
+        p#hint { font-weight: 500; color: #555; }
+        
+        /* Mobil Optimizasyonu */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.3rem; }
+            .heart { font-size: 45px; padding: 10px; } /* Mobilde tıklamak daha da kolay olsun */
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div id="game-container">
+    <div id="ui">
+        <h1 id="title">Ayşe'nin Kalp Avı ❤️</h1>
+        <div id="score-board">Hedef: 20 Kalp | Toplanan: <span id="score">0</span></div>
+        <p id="hint">Uçakları ve kalpleri yakala!</p>
+    </div>
+
+    <div id="countdown">
+        <h1>Kavuşmamıza Çok Az Kaldı! ✈️</h1>
+        <p>İstanbul'dan Mersin'e yolculuk için geri sayım:</p>
+        <div id="timer" style="font-size: 1.3rem; font-weight: 800; color: var(--main-pink); margin: 15px 0;"></div>
+        <p style="margin-top: 15px; font-style: italic; color: #555;">"Senin yeşil gözlerine bakmak için gün sayıyorum Ayşe."</p>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    const target = 20;
+    const gameContainer = document.getElementById('game-container');
+    const scoreDisplay = document.getElementById('score');
+    const ui = document.getElementById('ui');
+    const countdownDiv = document.getElementById('countdown');
+    const timerDisplay = document.getElementById('timer');
+
+    function createHeart() {
+        if (score >= target) return;
+        
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        // Uçak ihtimalini biraz artırdım :)
+        heart.innerHTML = Math.random() > 0.7 ? '✈️' : '❤️';
+        heart.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+        heart.style.top = '-60px';
+        
+        let fallDuration = Math.random() * 2 + 2.5; 
+        heart.style.transition = `top ${fallDuration}s linear`;
+        
+        gameContainer.appendChild(heart);
+
+        setTimeout(() => {
+            heart.style.top = window.innerHeight + 50 + 'px';
+        }, 100);
+
+        heart.onclick = () => {
+            score++;
+            scoreDisplay.innerText = score;
+            heart.style.transform = 'scale(2)';
+            heart.style.opacity = '0';
+            setTimeout(() => heart.remove(), 100);
+            
+            if (score >= target) {
+                showSurprise();
+            }
+        };
+
+        setTimeout(() => {
+            if (heart.parentNode) heart.remove();
+        }, fallDuration * 1000 + 200);
+    }
+
+    const gameInterval = setInterval(createHeart, 750);
+
+    function showSurprise() {
+        clearInterval(gameInterval);
+        ui.style.display = 'none';
+        document.querySelectorAll('.heart').forEach(h => h.remove());
+        countdownDiv.style.display = 'block';
+        startTimer();
+    }
+
+    function startTimer() {
+        // Tarih: 16 Ocak 2026
+        const targetDate = new Date("January 16, 2026 00:00:00").getTime();
+
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            timerDisplay.innerText = `${days} GÜN\n${hours} Sa ${mins} Dk ${secs} Sn`;
+        }, 1000);
+    }
+</script>
+</body>
+</html>
