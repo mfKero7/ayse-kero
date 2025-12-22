@@ -10,21 +10,28 @@
             margin: 0; padding: 0; width: 100%; height: 100%; 
             overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
-            background-image: url('bg.JPG'); /* Büyük harf JPG yaptım kanka dikkat */
+            background-image: url('bg.jpg'); /* Küçük harf yaptım, sende hangisiyse ona göre düzelt kanka */
             background-size: cover; background-position: center; background-repeat: no-repeat;
             position: relative;
         }
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 240, 243, 0.8); z-index: 1;
+            background-color: rgba(255, 240, 243, 0.75); z-index: 1;
         }
         #game-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
         #ui { position: absolute; top: 20px; z-index: 10; text-align: center; width: 100%; }
         .heart { position: absolute; font-size: 30px; cursor: pointer; user-select: none; transition: transform 0.1s; z-index: 8; }
-        #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px; border: 2px solid var(--main-pink); z-index: 20; }
+        #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px; border: 2px solid var(--main-pink); z-index: 20; animation: bounceIn 1s ease; }
+        @keyframes bounceIn {
+            0% { transform: scale(0.1); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
         h1 { color: var(--main-pink); font-size: 1.5rem; }
-        #score-board { font-weight: bold; font-size: 1.2rem; }
-        #timer { font-size: 1.3rem; font-weight: 800; color: var(--main-pink); margin: 15px 0; white-space: pre-line; }
+        #timer { font-size: 1.4rem; font-weight: 800; color: var(--main-pink); margin: 15px 0; white-space: pre-line; }
+        
+        /* Kutlama efekti için CSS */
+        .confetti { position: absolute; z-index: 25; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -43,9 +50,9 @@
     </div>
 
     <div id="countdown">
-        <h1>Kavuşmamıza Çok Az Kaldı! ✈️</h1>
+        <h1>Seni Çok Özledim Ayşe! ✈️</h1>
         <div id="timer"></div>
-        <p style="margin-top: 15px; font-style: italic; color: #555;">"Senin yeşil gözlerine bakmak için gün sayıyorum Ayşe."</p>
+        <p style="margin-top: 15px; font-style: italic; color: #555;">"Senin yeşil gözlerine bakmak için gün sayıyorum."</p>
     </div>
 </div>
 
@@ -61,67 +68,70 @@
 
     function createHeart() {
         if (score >= target) return;
-        
         const heart = document.createElement('div');
         heart.className = 'heart';
         heart.innerHTML = Math.random() > 0.7 ? '✈️' : '❤️';
         heart.style.left = Math.random() * (window.innerWidth - 60) + 'px';
         heart.style.top = '-60px';
-        
         let fallDuration = Math.random() * 2 + 2.5; 
         heart.style.transition = `top ${fallDuration}s linear`;
-        
         gameContainer.appendChild(heart);
-
-        setTimeout(() => {
-            heart.style.top = window.innerHeight + 50 + 'px';
-        }, 100);
+        setTimeout(() => { heart.style.top = window.innerHeight + 50 + 'px'; }, 100);
 
         heart.onclick = () => {
-            // Müzik kontrolü: İlk tıklamada çalmaya başlar
-            if (music.paused) {
-                music.play().catch(e => console.log("Müzik başlatılamadı:", e));
-                document.getElementById('hint').innerText = "Harikasın, devam et!";
-            }
-
+            if (music.paused) { music.play(); document.getElementById('hint').innerText = "Vay, müzik de geldi! Devam..."; }
             score++;
             scoreDisplay.innerText = score;
             heart.style.transform = 'scale(2)';
             heart.style.opacity = '0';
             setTimeout(() => heart.remove(), 100);
-            
-            if (score >= target) {
-                showSurprise();
-            }
+            if (score >= target) showSurprise();
         };
-
-        setTimeout(() => {
-            if (heart.parentNode) heart.remove();
-        }, fallDuration * 1000 + 200);
+        setTimeout(() => { if (heart.parentNode) heart.remove(); }, fallDuration * 1000 + 200);
     }
 
     const gameInterval = setInterval(createHeart, 750);
+
+    // KUTLAMA EFEKTİ FONKSİYONU
+    function celebrate() {
+        for(let i=0; i<50; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.innerHTML = ['❤️','💖','✨','🌸'][Math.floor(Math.random()*4)];
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.top = '-20px';
+            c.style.fontSize = (Math.random()*20 + 20) + 'px';
+            document.body.appendChild(c);
+            
+            const duration = Math.random() * 3 + 2;
+            c.animate([
+                { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                { transform: `translate(${(Math.random()-0.5)*200}px, ${window.innerHeight}px) rotate(720deg)`, opacity: 0 }
+            ], { duration: duration * 1000, easing: 'ease-out' });
+            
+            setTimeout(() => c.remove(), duration * 1000);
+        }
+    }
 
     function showSurprise() {
         clearInterval(gameInterval);
         ui.style.display = 'none';
         document.querySelectorAll('.heart').forEach(h => h.remove());
         countdownDiv.style.display = 'block';
+        celebrate(); // Konfetileri patlat!
+        setInterval(celebrate, 3000); // Her 3 saniyede bir patlatmaya devam et
         startTimer();
     }
 
     function startTimer() {
         const targetDate = new Date("January 16, 2026 00:00:00").getTime();
-
         setInterval(() => {
             const now = new Date().getTime();
             const diff = targetDate - now;
-
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
             timerDisplay.innerText = `${days} GÜN\n${hours} Sa ${mins} Dk ${secs} Sn`;
         }, 1000);
     }
