@@ -111,7 +111,15 @@
         setTimeout(() => { heart.style.top = window.innerHeight + 60 + 'px'; }, 100);
 
         heart.onclick = () => {
-            if (music.paused) { music.play().catch(() => {}); }
+            if (music.paused) { 
+                music.play().catch(() => {}); 
+                // Yazıyı güncelleyip kısa süre sonra yok eden kısım kanka:
+                const hint = document.getElementById('hint');
+                if(hint) {
+                    hint.innerText = "Harikasın! 😍"; 
+                    setTimeout(() => { hint.style.transition = "opacity 0.5s"; hint.style.opacity = '0'; }, 1500); 
+                }
+            }
             score++;
             scoreDisplay.innerText = score;
             
