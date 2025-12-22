@@ -10,27 +10,26 @@
             margin: 0; padding: 0; width: 100%; height: 100%; 
             overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
-            background-image: url('bg.JPG'); /* Küçük harf yaptım, sende hangisiyse ona göre düzelt kanka */
+            /* KANKA: Dosya adın bg.jpg ise böyle kalsın, JPG ise JPG yap */
+            background-image: url('bg.JPG'); 
             background-size: cover; background-position: center; background-repeat: no-repeat;
+            background-color: #fff0f3;
             position: relative;
         }
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 240, 243, 0.75); z-index: 1;
+            background-color: rgba(255, 240, 243, 0.65); z-index: 1;
         }
         #game-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
         #ui { position: absolute; top: 20px; z-index: 10; text-align: center; width: 100%; }
-        .heart { position: absolute; font-size: 30px; cursor: pointer; user-select: none; transition: transform 0.1s; z-index: 8; }
-        #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px; border: 2px solid var(--main-pink); z-index: 20; animation: bounceIn 1s ease; }
+        .heart { position: absolute; font-size: 40px; cursor: pointer; user-select: none; transition: transform 0.1s; z-index: 8; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2)); }
+        #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); margin: 20px; border: 3px solid var(--main-pink); z-index: 20; animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes bounceIn {
-            0% { transform: scale(0.1); opacity: 0; }
-            60% { transform: scale(1.1); }
+            0% { transform: scale(0.3); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        h1 { color: var(--main-pink); font-size: 1.5rem; }
-        #timer { font-size: 1.4rem; font-weight: 800; color: var(--main-pink); margin: 15px 0; white-space: pre-line; }
-        
-        /* Kutlama efekti için CSS */
+        h1 { color: var(--main-pink); font-size: 1.6rem; margin-bottom: 10px; }
+        #timer { font-size: 1.5rem; font-weight: 900; color: var(--main-pink); margin: 15px 0; white-space: pre-line; line-height: 1.4; }
         .confetti { position: absolute; z-index: 25; pointer-events: none; }
     </style>
 </head>
@@ -44,15 +43,16 @@
 
 <div id="game-container">
     <div id="ui">
-        <h1 id="title">Ayşe'nin Kalp Avı ❤️</h1>
-        <div id="score-board">Hedef: 20 Kalp | Toplanan: <span id="score">0</span></div>
-        <p id="hint">Müziği başlatmak için bir kalbe dokun!</p>
+        <h1 id="title">Ayşe'nin Kalp Avı ✨</h1>
+        <div id="score-board" style="font-size: 1.3rem; font-weight: bold;">Hedef: 20 Puan | Skor: <span id="score">0</span></div>
+        <p id="hint">Müzik için bir kalbe dokun!</p>
     </div>
 
     <div id="countdown">
-        <h1>Seni Çok Özledim Ayşe! ✈️</h1>
+        <h1>Seni Çok Özledim Ayşe! ❤️‍🔥</h1>
         <div id="timer"></div>
-        <p style="margin-top: 15px; font-style: italic; color: #555;">"Senin yeşil gözlerine bakmak için gün sayıyorum."</p>
+        <p style="margin-top: 15px; font-weight: 500; color: #444;">Kavuşmamıza kalan süre...</p>
+        <p style="font-style: italic; color: #777; font-size: 0.9rem; margin-top: 10px;">Yeşil gözlerini görmek için sabırsızlanıyorum.</p>
     </div>
 </div>
 
@@ -66,47 +66,64 @@
     const countdownDiv = document.getElementById('countdown');
     const timerDisplay = document.getElementById('timer');
 
+    // KANKA: İstediğin kalpler burada. ❤️ ve ❤️‍🔥 daha fazla yağsın diye onları listeye çok ekledim.
+    const heartEmojis = [
+        '❤️', '❤️', '❤️', '❤️‍🔥', '❤️‍🔥', '❤️‍🔥', // Ağırlıklı kalpler
+        '💖', '💗', '💘', '🥰', '💚', '💚', '❤️'       // Diğer kalpler
+    ];
+
     function createHeart() {
         if (score >= target) return;
+        
         const heart = document.createElement('div');
         heart.className = 'heart';
-        heart.innerHTML = Math.random() > 0.7 ? '✈️' : '❤️';
+        
+        // %10 ihtimalle uçak, %90 ihtimalle listedeki kalpler
+        if (Math.random() > 0.9) {
+            heart.innerHTML = '✈️';
+        } else {
+            heart.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+        }
+        
         heart.style.left = Math.random() * (window.innerWidth - 60) + 'px';
-        heart.style.top = '-60px';
-        let fallDuration = Math.random() * 2 + 2.5; 
+        heart.style.top = '-70px';
+        
+        let fallDuration = Math.random() * 1.5 + 2.5; 
         heart.style.transition = `top ${fallDuration}s linear`;
+        
         gameContainer.appendChild(heart);
-        setTimeout(() => { heart.style.top = window.innerHeight + 50 + 'px'; }, 100);
+
+        setTimeout(() => { heart.style.top = window.innerHeight + 60 + 'px'; }, 100);
 
         heart.onclick = () => {
-            if (music.paused) { music.play(); document.getElementById('hint').innerText = "Vay, müzik de geldi! Devam..."; }
+            if (music.paused) { music.play().catch(() => {}); }
             score++;
             scoreDisplay.innerText = score;
-            heart.style.transform = 'scale(2)';
+            heart.style.transform = 'scale(2.5) rotate(25deg)';
             heart.style.opacity = '0';
             setTimeout(() => heart.remove(), 100);
             if (score >= target) showSurprise();
         };
+
         setTimeout(() => { if (heart.parentNode) heart.remove(); }, fallDuration * 1000 + 200);
     }
 
-    const gameInterval = setInterval(createHeart, 750);
+    const gameInterval = setInterval(createHeart, 650);
 
-    // KUTLAMA EFEKTİ FONKSİYONU
     function celebrate() {
-        for(let i=0; i<50; i++) {
+        for(let i=0; i<30; i++) {
             const c = document.createElement('div');
             c.className = 'confetti';
-            c.innerHTML = ['❤️','💖','✨','🌸'][Math.floor(Math.random()*4)];
+            c.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
             c.style.left = Math.random() * 100 + 'vw';
-            c.style.top = '-20px';
+            c.style.top = '-30px';
             c.style.fontSize = (Math.random()*20 + 20) + 'px';
             document.body.appendChild(c);
             
             const duration = Math.random() * 3 + 2;
             c.animate([
                 { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
-                { transform: `translate(${(Math.random()-0.5)*200}px, ${window.innerHeight}px) rotate(720deg)`, opacity: 0 }
+                { transform: `translate(${(Math.random()-0.5)*300}px, ${window.innerHeight}px) rotate(720deg)`, opacity: 0 }
             ], { duration: duration * 1000, easing: 'ease-out' });
             
             setTimeout(() => c.remove(), duration * 1000);
@@ -118,8 +135,8 @@
         ui.style.display = 'none';
         document.querySelectorAll('.heart').forEach(h => h.remove());
         countdownDiv.style.display = 'block';
-        celebrate(); // Konfetileri patlat!
-        setInterval(celebrate, 3000); // Her 3 saniyede bir patlatmaya devam et
+        celebrate();
+        setInterval(celebrate, 2500); 
         startTimer();
     }
 
