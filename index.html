@@ -10,53 +10,41 @@
             margin: 0; padding: 0; width: 100%; height: 100%; 
             overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
-            /* Arka plan resmi ayarları */
-            /* Eskisi: url('bg.jpg') */
-            background-image: url('bg.JPG'); /* Fotoğrafın adı burada */
-            background-size: cover; /* Tüm ekranı kapla */
-            background-position: center; /* Ortala */
-            background-repeat: no-repeat;
+            background-image: url('bg.JPG'); /* Büyük harf JPG yaptım kanka dikkat */
+            background-size: cover; background-position: center; background-repeat: no-repeat;
             position: relative;
         }
-        
-        /* Fotoğrafın üzerine gelen pembe filtre katmanı */
         .overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 240, 243, 0.85); /* %85 opaklıkta pembe filtre */
-            z-index: 1;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 240, 243, 0.8); z-index: 1;
         }
-
         #game-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
         #ui { position: absolute; top: 20px; z-index: 10; text-align: center; width: 100%; }
         .heart { position: absolute; font-size: 30px; cursor: pointer; user-select: none; transition: transform 0.1s; z-index: 8; }
         #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px; border: 2px solid var(--main-pink); z-index: 20; }
         h1 { color: var(--main-pink); font-size: 1.5rem; }
         #score-board { font-weight: bold; font-size: 1.2rem; }
-        p#hint { font-weight: 500; color: #555; }
-        
-        /* Mobil Optimizasyonu */
-        @media (max-width: 600px) {
-            h1 { font-size: 1.3rem; }
-            .heart { font-size: 45px; padding: 10px; } /* Mobilde tıklamak daha da kolay olsun */
-        }
+        #timer { font-size: 1.3rem; font-weight: 800; color: var(--main-pink); margin: 15px 0; white-space: pre-line; }
     </style>
 </head>
 <body>
 
 <div class="overlay"></div>
 
+<audio id="bgMusic" loop>
+    <source src="ask.mp3" type="audio/mpeg">
+</audio>
+
 <div id="game-container">
     <div id="ui">
         <h1 id="title">Ayşe'nin Kalp Avı ❤️</h1>
         <div id="score-board">Hedef: 20 Kalp | Toplanan: <span id="score">0</span></div>
-        <p id="hint">Uçakları ve kalpleri yakala!</p>
+        <p id="hint">Müziği başlatmak için bir kalbe dokun!</p>
     </div>
 
     <div id="countdown">
         <h1>Kavuşmamıza Çok Az Kaldı! ✈️</h1>
-        <p>İstanbul'dan Mersin'e yolculuk için geri sayım:</p>
-        <div id="timer" style="font-size: 1.3rem; font-weight: 800; color: var(--main-pink); margin: 15px 0;"></div>
+        <div id="timer"></div>
         <p style="margin-top: 15px; font-style: italic; color: #555;">"Senin yeşil gözlerine bakmak için gün sayıyorum Ayşe."</p>
     </div>
 </div>
@@ -64,6 +52,7 @@
 <script>
     let score = 0;
     const target = 20;
+    const music = document.getElementById('bgMusic');
     const gameContainer = document.getElementById('game-container');
     const scoreDisplay = document.getElementById('score');
     const ui = document.getElementById('ui');
@@ -75,7 +64,6 @@
         
         const heart = document.createElement('div');
         heart.className = 'heart';
-        // Uçak ihtimalini biraz artırdım :)
         heart.innerHTML = Math.random() > 0.7 ? '✈️' : '❤️';
         heart.style.left = Math.random() * (window.innerWidth - 60) + 'px';
         heart.style.top = '-60px';
@@ -90,6 +78,12 @@
         }, 100);
 
         heart.onclick = () => {
+            // Müzik kontrolü: İlk tıklamada çalmaya başlar
+            if (music.paused) {
+                music.play().catch(e => console.log("Müzik başlatılamadı:", e));
+                document.getElementById('hint').innerText = "Harikasın, devam et!";
+            }
+
             score++;
             scoreDisplay.innerText = score;
             heart.style.transform = 'scale(2)';
@@ -117,7 +111,6 @@
     }
 
     function startTimer() {
-        // Tarih: 16 Ocak 2026
         const targetDate = new Date("January 16, 2026 00:00:00").getTime();
 
         setInterval(() => {
