@@ -160,6 +160,9 @@
         celebrate();
         setInterval(celebrate, 2500); 
         startTimer();
+
+        // KANKA: Uçak rotasını burada SADECE BİR KERE, yarım saniye gecikmeyle başlatıyoruz
+        setTimeout(updateProgress, 500); 
     }
 
     function updateProgress() {
@@ -186,7 +189,9 @@
             const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const secs = Math.floor((diff % (1000 * 60)) / 1000);
             timerDisplay.innerText = `${days} GÜN\n${hours} Sa ${mins} Dk ${secs} Sn`;
-            updateProgress();
+            
+            // KANKA: Buradaki updateProgress(); satırını sildik! 
+            // Uçak artık sabit duracak.
         }, 1000);
     }
 </script>
