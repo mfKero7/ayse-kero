@@ -65,28 +65,34 @@
     </div>
 </div>
 
-<div id="countdown">
-    <h1>Seni Çok Özledim Ayşe! ❤️‍🔥</h1>
-    <div class="progress-container">
-        <div class="locations">
-            <span>İstanbul 🛫</span>
-            <span>Mersin 🛬</span>
-        </div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="prog-fill"></div>
-        </div>
-        <div class="plane-icon" id="plane-icon">✈️</div>
-    </div>
-    <div id="timer"></div>
+<div id="countdown" style="background: rgba(255, 255, 255, 0.75); border: 2px solid white;">
+    <h1>İyi ki Geldin Ayşe... ✨</h1>
     
-    <p style="margin-top: 25px; font-weight: 400; color: #999; font-size: 0.95rem; font-style: italic;">
-        Yeşil gözlerini görmek için sabırsızlanıyorum...
+    <div id="special-message" style="font-size: 1.1rem; line-height: 1.6; color: #333; min-height: 120px; font-weight: 500; text-align: left; padding: 10px;"></div>
+    
+    <p style="margin-top: 20px; font-weight: 400; color: #777; font-size: 0.9rem; font-style: italic; border-top: 1px solid rgba(255, 77, 109, 0.3); padding-top: 10px;">
+        o yeşil gözlere bakmak her şeye değdi.
     </p>
 </div>
 
 <script>
     let score = 0;
     const target = 20;
+    
+
+    // HİLE BURADA:
+    let secretClickCount = 0;
+    document.getElementById('title').onclick = () => {
+        secretClickCount++;
+        if (secretClickCount === 5) {
+            showSurprise();
+        }
+        setTimeout(() => { secretClickCount = 0; }, 3000);
+    };
+
+    function createHeart() {
+        // ... kalp oluşturma kodların ...
+    }
     const music = document.getElementById('bgMusic');
     const gameContainer = document.getElementById('game-container');
     const scoreDisplay = document.getElementById('score');
@@ -169,39 +175,7 @@
         setInterval(celebrate, 2500); 
         startTimer();
 
-        // KANKA: Uçak rotasını burada SADECE BİR KERE, yarım saniye gecikmeyle başlatıyoruz
-        setTimeout(updateProgress, 500); 
-    }
-
-    function updateProgress() {
-        // BAŞLANGIÇ TARİHİ: 11 EKİM 2025
-        const startDate = new Date("October 11, 2025 00:00:00").getTime(); 
-        const targetDate = new Date("January 25, 2026 00:00:00").getTime();
-        const now = new Date().getTime();
-
-        const totalDuration = targetDate - startDate;
-        const elapsed = now - startDate;
-        let percentage = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
-
-        document.getElementById('prog-fill').style.width = percentage + '%';
-        document.getElementById('plane-icon').style.left = `calc(${percentage}% - 15px)`;
-    }
-
-    function startTimer() {
-        const targetDate = new Date("January 25, 2026 00:00:00").getTime();
-        setInterval(() => {
-            const now = new Date().getTime();
-            const diff = targetDate - now;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-            timerDisplay.innerText = `${days} GÜN\n${hours} Sa ${mins} Dk ${secs} Sn`;
-            
-            // KANKA: Buradaki updateProgress(); satırını sildik! 
-            // Uçak artık sabit duracak.
-        }, 1000);
-    }
+    
 </script>
 </body>
 </html>
