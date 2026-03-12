@@ -13,27 +13,25 @@
             background-image: url('bppg.JPG'); 
             background-size: cover; background-position: center; background-repeat: no-repeat;
             background-color: #fff0f3;
-            position: relative; transition: all 0.5s ease;
+            position: relative;
         }
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 240, 243, 0.6); z-index: 1; transition: background-color 0.5s ease;
+            background-color: rgba(255, 240, 243, 0.6); z-index: 1;
         }
         #game-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 5; padding-top: 40px; }
-        #ui { text-align: center; width: 100%; background: none; box-shadow: none; }
-        .heart { position: absolute; font-size: 40px; cursor: pointer; user-select: none; transition: transform 0.1s; z-index: 8; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2)); }
+        #ui { text-align: center; width: 100%; background: none; z-index: 10; }
         
-        /* Final Mesaj Kutusu */
-        #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.85); padding: 25px 20px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); width: 85%; max-width: 400px; border: 2px solid white; z-index: 20; animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        @keyframes bounceIn { 0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        .heart { position: absolute; font-size: 40px; cursor: pointer; user-select: none; z-index: 8; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2)); transition: transform 0.1s; }
         
+        #countdown { display: none; text-align: center; background: rgba(255, 255, 255, 0.85); padding: 25px 20px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); width: 85%; max-width: 400px; border: 2px solid white; z-index: 20; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
         h1 { color: var(--main-pink); font-size: 1.6rem; margin: 0 0 15px 0; }
-        #special-message { font-size: 1.1rem; line-height: 1.6; color: #333; min-height: 100px; font-weight: 500; text-align: left; padding: 10px; }
+        #special-message { font-size: 1.1rem; line-height: 1.6; color: #333; min-height: 80px; font-weight: 500; text-align: left; padding: 10px; }
         .confetti { position: absolute; z-index: 25; pointer-events: none; }
         
         /* Yeşil Göz Modu */
         body.green-mode .overlay { background-color: rgba(46, 204, 113, 0.5); }
-        #green-msg { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: bold; color: var(--main-green); z-index: 30; text-align: center; width: 90%; }
+        #green-msg { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.8rem; font-weight: bold; color: var(--main-green); z-index: 30; text-align: center; width: 90%; text-shadow: 0 0 10px white; }
     </style>
 </head>
 <body>
@@ -47,9 +45,9 @@
 
 <div id="game-container">
     <div id="ui">
-        <h1 id="title" style="cursor: pointer;">Ayşe'nin Kalp Avı ✨</h1>
-        <div id="score-board" style="font-size: 1.3rem; font-weight: bold;">Hedef: 20 | Skor: <span id="score">0</span></div>
-        <p id="hint" style="margin-top: 10px; font-weight: 500; color: #666;">Müzik için bir kalbe dokun!</p>
+        <h1 id="title" style="cursor: pointer; user-select: none;">Ayşe'nin Kalp Avı ✨</h1>
+        <div id="score-board" style="font-size: 1.3rem; font-weight: bold; color: #444;">Hedef: 20 | Skor: <span id="score">0</span></div>
+        <p id="hint" style="margin-top: 10px; font-weight: 500; color: #666; transition: opacity 0.5s;">Müzik için bir kalbe dokun!</p>
     </div>
 </div>
 
@@ -62,82 +60,108 @@
 </div>
 
 <script>
+    // Değişkenler
     let score = 0;
     const target = 20;
     const music = document.getElementById('bgMusic');
-    const gameContainer = document.getElementById('game-container');
     const scoreDisplay = document.getElementById('score');
     const countdownDiv = document.getElementById('countdown');
+    const gameContainer = document.getElementById('game-container');
     const greenMsg = document.getElementById('green-msg');
 
     // KANKA MESAJINI BURAYA YAZ:
     const myMessage = "Seni karşımda gördüğüm o ilk an, beklediğim her saniyenin ne kadar değerli olduğunu bir kez daha anladım. Mesafeler bitti, artık yan yanayız. Seninle geçen her dakika benim için en büyük hediye. İyi ki hayatımdasın, iyi ki geldin...";
 
-    // --- GİZLİ HİLE MEVZUSU ---
+    // --- HİLE SİSTEMİ ---
     let secretClicks = 0;
-    document.getElementById('title').onclick = () => {
+    document.getElementById('title').addEventListener('click', () => {
         secretClicks++;
-        if (secretClicks === 5) showSurprise();
+        if (secretClicks === 5) {
+            showSurprise();
+        }
         setTimeout(() => { secretClicks = 0; }, 2000);
-    };
+    });
 
-    // --- KALPLERİ AKITAN ANA FONKSİYON ---
-    const heartEmojis = ['❤️', '❤️‍🔥', '💖', '💗', '💘', '🥰', '💚', '🌸'];
+    // --- KALPLERİ OLUŞTURMA ---
+    const emojis = ['❤️', '❤️‍🔥', '💖', '💗', '💘', '🥰', '💚', '🌸'];
 
     function createHeart() {
         if (score >= target) return;
+
         const heart = document.createElement('div');
         heart.className = 'heart';
-        heart.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+        heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
         
-        heart.style.left = Math.random() * (window.innerWidth - 60) + 'px';
-        heart.style.top = '-70px';
-        let fallDuration = Math.random() * 1.5 + 2.5; 
-        heart.style.transition = `top ${fallDuration}s linear`;
+        // Rastgele yatay pozisyon
+        const xPos = Math.random() * (window.innerWidth - 50);
+        heart.style.left = xPos + 'px';
+        heart.style.top = '-60px';
+        
+        // Düşüş hızı
+        const duration = Math.random() * 2 + 2.5; 
+        heart.style.transition = `top ${duration}s linear`;
+        
         gameContainer.appendChild(heart);
 
-        setTimeout(() => { heart.style.top = window.innerHeight + 60 + 'px'; }, 100);
+        // Düşüşü başlat
+        setTimeout(() => {
+            heart.style.top = (window.innerHeight + 60) + 'px';
+        }, 50);
 
+        // Tıklama olayı
         heart.onclick = () => {
             if (music.paused) { 
-                music.play().catch(() => {});
+                music.play().catch(e => console.log("Müzik çalma hatası:", e));
                 document.getElementById('hint').style.opacity = '0';
             }
+            
             score++;
             scoreDisplay.innerText = score;
             
+            // Yeşil Göz Modu (Skor 11'de)
             if (score === 11) {
                 document.body.classList.add('green-mode');
                 greenMsg.style.display = 'block';
-                setTimeout(() => { document.body.classList.remove('green-mode'); greenMsg.style.display = 'none'; }, 2500);
+                setTimeout(() => {
+                    document.body.classList.remove('green-mode');
+                    greenMsg.style.display = 'none';
+                }, 2500);
             }
 
-            heart.style.transform = 'scale(2.5) rotate(25deg)';
+            // Yok olma efekti
+            heart.style.transform = 'scale(2.5)';
             heart.style.opacity = '0';
-            setTimeout(() => heart.remove(), 100);
+            setTimeout(() => { if(heart.parentNode) heart.remove(); }, 150);
+            
             if (score >= target) showSurprise();
         };
-        setTimeout(() => { if (heart.parentNode) heart.remove(); }, fallDuration * 1000 + 200);
+
+        // Ekrandan çıkınca temizle
+        setTimeout(() => {
+            if (heart.parentNode) heart.remove();
+        }, duration * 1000 + 100);
     }
 
-    // KALPLERİ BAŞLATAN MOTOR BURASI (Silmiş olabilirsin kanka):
-    const gameInterval = setInterval(createHeart, 650);
+    // Kalp akışını başlat
+    const flowInterval = setInterval(createHeart, 700);
 
-    // --- FİNAL EKRANI VE DAKTİLO ---
+    // --- FİNAL ---
     function showSurprise() {
-        clearInterval(gameInterval);
-        document.getElementById('game-container').style.display = 'none';
+        clearInterval(flowInterval);
+        gameContainer.style.display = 'none';
         document.querySelectorAll('.heart').forEach(h => h.remove());
-        countdownDiv.style.display = 'block';
         
+        countdownDiv.style.display = 'block';
         celebrate();
         setInterval(celebrate, 2000); 
+        
         typeWriter(myMessage, "special-message", 60);
     }
 
     function typeWriter(text, elementId, speed) {
         let i = 0;
         const elem = document.getElementById(elementId);
+        elem.innerHTML = "";
         function type() {
             if (i < text.length) {
                 elem.innerHTML += text.charAt(i);
@@ -152,11 +176,19 @@
         for(let i=0; i<25; i++) {
             const c = document.createElement('div');
             c.className = 'confetti';
-            c.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            c.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
             c.style.left = Math.random() * 100 + 'vw';
             c.style.top = '-30px';
             c.style.fontSize = (Math.random()*20 + 20) + 'px';
             document.body.appendChild(c);
-            const duration = Math.random() * 3 + 2;
+            const dur = Math.random() * 3 + 2;
             c.animate([
-                { transform: `translate(0, 0) rotate(0deg)`,
+                { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+                { transform: `translate(${(Math.random()-0.5)*300}px, ${window.innerHeight}px) rotate(720deg)`, opacity: 0 }
+            ], { duration: dur * 1000, easing: 'ease-out' });
+            setTimeout(() => c.remove(), dur * 1000);
+        }
+    }
+</script>
+</body>
+</html>
